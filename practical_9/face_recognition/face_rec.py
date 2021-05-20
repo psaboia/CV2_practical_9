@@ -65,14 +65,14 @@ while True:
 
     # *** Task 1. Convert the frame to grayscale image and RGB (from BGR) using cv2.cvtColor(...)
     # 
-    # gray = ...    # this will be used by Viola-Jones detector
-    # rgb = ...     # this will be used by ResNet-based face encoder
+    gray = cv2.cvtColor(frame, cv2.BGR2GRAY)    # this will be used by Viola-Jones detector
+    rgb = cv2.cvtColor(frame, cv2.BGR2RGB)     # this will be used by ResNet-based face encoder
 
 
     # *** Task 2. Run detectMultiScale(...) method from the "detector" to get a vector of rectangles, 
     # possibly containing faces:
     # 
-    # rectangles = ...
+    rectangles = detector.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, flags=cv2.CASCADE_SCALE_IMAGE)
     # 
     # arguments of detectMultiScale(...):
     # scaleFactor: how much the image size is reduced at each image scale. Used to create the VJ scale pyramid (1.05 -- 1.4)
@@ -80,8 +80,8 @@ while True:
     # minSize = (N, M): minimum possible face size (depends on your resolution, but (30,30) should be fine)
 
     # Let's get boxes for all detected faces:
-    boxes = ... ( y, x + w, y + h, x ) for x, y, w, h in rectangles ]
-    # DEBUG: print("boxes: {}".format(np.shape(boxes)))
+    boxes = [ ( y, x + w, y + h, x ) for x, y, w, h in rectangles ]
+    print("boxes: {}".format(np.shape(boxes)))
 
     # *** Task 3. For each box in the "rectangles" do the face recognition:
 
@@ -92,7 +92,7 @@ while True:
 
         # compute the facial embeddings for all boxes (= detected faces)
         preds = recognizer.predict_proba(encodings)
-        # DEBUG: print("predictions: {}".format(np.shape(preds)))
+        DEBUG: print("predictions: {}".format(np.shape(preds)))
 
         # So what have so far:
         # -- boxes: a (N,4) matrix of N boxes for N detected faces
