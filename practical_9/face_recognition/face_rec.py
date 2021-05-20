@@ -65,8 +65,8 @@ while True:
 
     # *** Task 1. Convert the frame to grayscale image and RGB (from BGR) using cv2.cvtColor(...)
     # 
-    gray = cv2.cvtColor(frame, cv2.BGR2GRAY)    # this will be used by Viola-Jones detector
-    rgb = cv2.cvtColor(frame, cv2.BGR2RGB)     # this will be used by ResNet-based face encoder
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)     # this will be used by ResNet-based face encoder
 
 
     # *** Task 2. Run detectMultiScale(...) method from the "detector" to get a vector of rectangles, 
@@ -81,7 +81,6 @@ while True:
 
     # Let's get boxes for all detected faces:
     boxes = [ ( y, x + w, y + h, x ) for x, y, w, h in rectangles ]
-    print("boxes: {}".format(np.shape(boxes)))
 
     # *** Task 3. For each box in the "rectangles" do the face recognition:
 
@@ -92,7 +91,6 @@ while True:
 
         # compute the facial embeddings for all boxes (= detected faces)
         preds = recognizer.predict_proba(encodings)
-        DEBUG: print("predictions: {}".format(np.shape(preds)))
 
         # So what have so far:
         # -- boxes: a (N,4) matrix of N boxes for N detected faces
@@ -105,6 +103,19 @@ while True:
         #    by searching for the class index with the highest probability 
         # -- display the result on screen (box + the person's name)
         #    tip: use cv2.rectangle(...) and cv2.putText(...) functions
+        
+        # threshold for unknown 
+        th = 0.8
+
+        for box, pred in zip(boxes, preds):
+            cv2.rectangle(frame, (box[0], box[3]), (box[1], box[2]), (255, 255, 255), 2)
+            id_max = np.argmax(pred)
+            pred_max = pred[id_max]
+            #print(id_max, pred_max, le.classes_[id_max])
+            text = "unknow"
+            if pred_max >= th:
+                text = "%s %.01f%%" % (le.classes_[id_max], pred_max*100)
+            cv2.putText(frame, text, (box[0],box[3]-5), 1, 1, (0, 255, 0), 2)
 
     cv2.imshow("Face detector", frame)
 
